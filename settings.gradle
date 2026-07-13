@@ -16,4 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "SweetHome"
 include ':app'
+include ':app-compose'
 include ':data'
