@@ -6,8 +6,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import com.sweethome.compose.R
+import com.sweethome.compose.ui.IntentionalA11yTags
 
 @Composable
 fun ProductImage(
@@ -25,6 +27,6 @@ fun ProductImage(
         painter = painterResource(imageId),
         contentDescription = null,
         contentScale = contentScale,
-        modifier = modifier
+        modifier = modifier.testTag(IntentionalA11yTags.PRODUCT_IMAGE)
     )
 }

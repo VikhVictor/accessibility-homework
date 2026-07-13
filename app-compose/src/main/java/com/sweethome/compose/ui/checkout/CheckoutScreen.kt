@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +41,7 @@ import com.sweethome.compose.logic.CheckoutLogic
 import com.sweethome.compose.logic.DeliveryOption
 import com.sweethome.compose.logic.SelectorIcon
 import com.sweethome.compose.logic.SelectorOption
+import com.sweethome.compose.ui.IntentionalA11yTags
 import com.sweethome.compose.ui.components.LegacyActionText
 import com.sweethome.compose.ui.components.LegacyBlack60
 import com.sweethome.compose.ui.components.LegacyGreen
@@ -166,6 +168,7 @@ private fun SelectorCard(
         Checkbox(
             checked = option.checked,
             onCheckedChange = { onSelected() },
+            modifier = Modifier.testTag(IntentionalA11yTags.SELECTOR_CHECKBOX),
             colors = CheckboxDefaults.colors(checkedColor = LegacyGreen)
         )
     }
@@ -206,6 +209,7 @@ private fun DeliveryRow(
             modifier = Modifier
                 .padding(start = 12.dp)
                 .size(20.dp)
+                .testTag(IntentionalA11yTags.DELIVERY_TOGGLE)
                 .clickable(onClick = onSelected)
         )
     }

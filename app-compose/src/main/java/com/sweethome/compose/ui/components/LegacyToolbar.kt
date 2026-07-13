@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sweethome.compose.R
+import com.sweethome.compose.ui.IntentionalA11yTags
 
 @Composable
 fun LegacyToolbar(
@@ -43,6 +45,7 @@ fun LegacyToolbar(
                 .align(Alignment.CenterStart)
                 .padding(start = 16.dp)
                 .size(20.dp)
+                .testTag(IntentionalA11yTags.TOOLBAR_BACK)
                 .clickable(onClick = onBack)
         )
 
@@ -69,6 +72,7 @@ fun LegacyToolbar(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .size(20.dp)
+                        .testTag(IntentionalA11yTags.TOOLBAR_CART)
                         .clickable(onClick = onCartClick)
                 )
                 if (cartItemsCount > 0) {
@@ -82,6 +86,7 @@ fun LegacyToolbar(
                             .size(16.dp)
                             .background(LegacyBlue, shape = androidx.compose.foundation.shape.CircleShape)
                             .padding(top = 1.dp, start = 4.dp)
+                            .testTag(IntentionalA11yTags.CART_BADGE)
                     )
                 }
             }

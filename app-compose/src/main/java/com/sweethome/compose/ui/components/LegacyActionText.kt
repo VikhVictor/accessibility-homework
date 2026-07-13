@@ -10,9 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sweethome.compose.ui.IntentionalA11yTags
 
 @Composable
 fun LegacyActionText(
@@ -31,6 +33,7 @@ fun LegacyActionText(
             .height(48.dp)
             .alpha(if (enabled) 1f else 0.3f)
             .background(LegacyGreen, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .testTag(IntentionalA11yTags.ACTION_TEXT)
             .then(if (enabled) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(top = 14.dp)
     )
