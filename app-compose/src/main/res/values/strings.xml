@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">SweetHome Compose</string>
+    <string name="checkout_confirm">Checkout</string>
+    <string name="cart_title">Shopping Cart</string>
+    <string name="confirm_checkout">Checkout</string>
+    <string name="shop_catalog_title">Furniture</string>
+    <string name="add_to_cart">Add to cart</string>
+    <string name="about_title">About</string>
+    <string name="designer_field">Designer</string>
+    <string name="checkout_title">Checkout</string>
+    <string name="delivery_from">Shipping\nfrom %s</string>
+    <string name="items_on">%s items on</string>
+    <string name="subtotal_price">Subtotal: %s</string>
+    <string name="shipment_price">Shipping: %s</string>
+    <string name="total_price_title">Total</string>
+    <string name="shipment_address">Shipping to</string>
+    <string name="delivery_type">Delivery</string>
+    <string name="payment_type">Payment</string>
+    <string name="time_from_to">%1$s-%2$s days</string>
+    <string name="delivery_time">%s days</string>
 </resources>

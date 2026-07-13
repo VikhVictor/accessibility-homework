@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SweetHome Compose</string>
+    <string name="checkout_confirm">Оплатить</string>
+    <string name="cart_title">Корзина</string>
+    <string name="confirm_checkout">Далее</string>
+    <string name="shop_catalog_title">Мебель</string>
+    <string name="add_to_cart">Добавить в корзину</string>
+    <string name="about_title">О товаре</string>
+    <string name="designer_field">Дизайнер</string>
+    <string name="checkout_title">Оформление заказа</string>
+    <string name="delivery_from">Доставка\nот %s</string>
+    <string name="items_on">%s товаров на</string>
+    <string name="subtotal_price">Корзина: %s</string>
+    <string name="shipment_price">Доставка: %s</string>
+    <string name="total_price_title">К оплате</string>
+    <string name="shipment_address">Куда доставить?</string>
+    <string name="delivery_type">Способ доставки</string>
+    <string name="payment_type">Способ оплаты</string>
+    <string name="time_from_to">%1$s-%2$s дней</string>
+    <string name="delivery_time">%s дня</string>
+</resources>

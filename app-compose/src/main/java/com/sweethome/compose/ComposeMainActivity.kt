@@ -3,38 +3,25 @@ package com.sweethome.compose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import com.sweethome.compose.logic.ShowcaseLogic
+import com.sweethome.compose.ui.SweetHomeComposeApp
 import com.sweethome.compose.ui.theme.SweetHomeComposeTheme
 
 class ComposeMainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val application = application as ComposeApplication
+        val logic = ShowcaseLogic(
+            application.catalogRepository,
+            application.cartRepository
+        )
         setContent {
             SweetHomeComposeTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    ComposeShowcaseShell()
-                }
+                SweetHomeComposeApp(
+                    logic = logic,
+                    onExit = ::finish
+                )
             }
         }
-    }
-}
-
-@Composable
-private fun ComposeShowcaseShell() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "SweetHome Compose")
     }
 }
