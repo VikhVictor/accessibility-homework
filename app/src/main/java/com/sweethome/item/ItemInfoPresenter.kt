@@ -1,15 +1,15 @@
 package com.sweethome.item
 
-import com.sweethome.CartRepository
-import com.sweethome.MockLoader
 import com.sweethome.RootRouterImpl
 import com.sweethome.base.MockPresenter
+import com.sweethome.data.CartRepository
+import com.sweethome.data.CatalogRepository
 
 class ItemInfoPresenter(
     private val rootRouter: RootRouterImpl,
-    mockLoader: MockLoader,
+    catalogRepository: CatalogRepository,
     private val cartRepository: CartRepository
-): MockPresenter<ItemInfoMvpView>(mockLoader) {
+): MockPresenter<ItemInfoMvpView>(catalogRepository) {
 
     private var itemId = ""
 
@@ -27,7 +27,7 @@ class ItemInfoPresenter(
     }
 
     private fun findItem(itemId: String): FullItemViewModel? {
-        return mockLoader.loadCatalog().find { it.id == itemId }
+        return catalogRepository.loadCatalog().find { it.id == itemId }
     }
 
     fun onAddToCartClicked() {

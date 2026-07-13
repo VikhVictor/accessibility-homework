@@ -1,16 +1,16 @@
 package com.sweethome.cart
 
-import com.sweethome.CartRepository
-import com.sweethome.MockLoader
 import com.sweethome.RootRouter
 import com.sweethome.base.MockPresenter
+import com.sweethome.data.CartRepository
+import com.sweethome.data.CatalogRepository
 import com.sweethome.item.FullItemViewModel
 
 class CartPresenter(
     private val rootRouter: RootRouter,
-    mockLoader: MockLoader,
+    catalogRepository: CatalogRepository,
     private val cartRepository: CartRepository
-): MockPresenter<CartMvpView>(mockLoader) {
+): MockPresenter<CartMvpView>(catalogRepository) {
 
     override fun attach(mvpView: CartMvpView) {
         super.attach(mvpView)
@@ -32,7 +32,7 @@ class CartPresenter(
     }
 
     fun loadData(): Map<FullItemViewModel, Int> {
-        val fullItemsList = mockLoader.loadCatalog()
+        val fullItemsList = catalogRepository.loadCatalog()
         val cartItems = fullItemsList.filter {
             cartRepository.cartItems.keys.contains(it.id)
         }

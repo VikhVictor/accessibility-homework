@@ -2,7 +2,8 @@ package com.sweethome
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.google.gson.Gson
+import com.sweethome.data.AssetsCatalogRepository
+import com.sweethome.data.InMemoryCartRepository
 
 class MainActivity : AppCompatActivity() {
 
@@ -14,8 +15,8 @@ class MainActivity : AppCompatActivity() {
 
         rootRouter = RootRouterImpl(
             supportFragmentManager,
-            CartRepository(),
-            MockLoader(Gson(), assets)
+            InMemoryCartRepository(),
+            AssetsCatalogRepository(assets)
         )
         rootRouter.showCatalog()
     }

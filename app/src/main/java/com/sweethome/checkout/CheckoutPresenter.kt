@@ -1,11 +1,11 @@
 package com.sweethome.checkout
 
-import com.sweethome.CartRepository
-import com.sweethome.MockLoader
 import com.sweethome.R
 import com.sweethome.RootRouter
 import com.sweethome.base.MockPresenter
 import com.sweethome.base.selector.SelectorItemModel
+import com.sweethome.data.CartRepository
+import com.sweethome.data.CatalogRepository
 import com.sweethome.checkout.address.AddressInteractor
 import com.sweethome.checkout.delivery.DeliveryInteractor
 import com.sweethome.checkout.delivery.DeliveryViewModel
@@ -13,9 +13,9 @@ import com.sweethome.checkout.payment.PaymentInteractor
 
 class CheckoutPresenter(
     rootRouter: RootRouter,
-    mockLoader: MockLoader,
+    catalogRepository: CatalogRepository,
     val cartRepository: CartRepository
-): MockPresenter<CheckoutMvpView>(mockLoader) {
+): MockPresenter<CheckoutMvpView>(catalogRepository) {
 
     private lateinit var itemsPrice: String
     private val paymentInteractor = PaymentInteractor()

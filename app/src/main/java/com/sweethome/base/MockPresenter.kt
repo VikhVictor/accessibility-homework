@@ -1,9 +1,11 @@
 package com.sweethome.base
 
 import androidx.annotation.CallSuper
-import com.sweethome.MockLoader
+import com.sweethome.data.CatalogRepository
 
-open class MockPresenter<T: MvpView> constructor(val mockLoader: MockLoader) {
+open class MockPresenter<T: MvpView> constructor(
+    protected val catalogRepository: CatalogRepository
+) {
 
     protected var mvpView: T? = null
 
