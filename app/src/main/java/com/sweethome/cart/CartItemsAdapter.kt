@@ -9,17 +9,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sweethome.R
-import com.sweethome.domain.model.Product
+import com.sweethome.item.FullItemViewModel
 
 
 class CartItemsAdapter : RecyclerView.Adapter<CartItemViewHolder>() {
 
-    val items = arrayListOf<Product>()
+    val items = arrayListOf<FullItemViewModel>()
 
-    fun updateList(list: List<Product>) {
+    fun updateList(list: List<FullItemViewModel>) {
         items.clear()
         items.addAll(list)
-        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CartItemViewHolder {

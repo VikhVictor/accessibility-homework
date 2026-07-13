@@ -3,42 +3,42 @@ package com.sweethome.shop
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sweethome.R
 import com.sweethome.base.BaseFragment
-import com.sweethome.base.viewModelFactory
-import com.sweethome.domain.model.Product
-import com.sweethome.presentation.catalog.CatalogUiState
-import com.sweethome.presentation.catalog.CatalogViewModel
+import com.sweethome.base.MvpView
+import com.sweethome.item.FullItemViewModel
 import com.sweethome.shop.catalog.CatalogAdapter
+import com.sweethome.shop.catalog.CategoryViewModel
 import com.sweethome.shop.category.OnItemClickListener
-import kotlinx.coroutines.launch
 
-class CatalogFragment : BaseFragment() {
+class CatalogFragment : BaseFragment<CatalogPresenter, CatalogMvpView>() {
 
     private lateinit var catalog: RecyclerView
     private lateinit var cartItemsAmount: TextView
     private lateinit var cartIcon: View
     private val adapter: CatalogAdapter = CatalogAdapter()
-    private val viewModel: CatalogViewModel by lazy {
-        ViewModelProvider(
-            this,
-            viewModelFactory(CatalogViewModel::class.java) {
-                CatalogViewModel(
-                    application.catalogRepository,
-                    application.cartRepository
-                )
-            }
-        )[CatalogViewModel::class.java]
-    }
     private val onItemClickListener: OnItemClickListener = object : OnItemClickListener {
-        override fun onItemClick(model: Product) {
-            rootRouter.openDetails(model)
+        override fun onItemClick(model: FullItemViewModel) {
+            presenter.onItemClick(model)
+        }
+    }
+
+    init {
+        mvpView = object : CatalogMvpView {
+            override fun updateList(models: ArrayList<CategoryViewModel>) {
+                adapter.setCatalogItems(models)
+            }
+
+            override fun updateItemsCount(itemsCount: Int) {
+                if (itemsCount == 0) {
+                    cartItemsAmount.visibility = View.GONE
+                } else {
+                    cartItemsAmount.visibility = View.VISIBLE
+                    cartItemsAmount.text = itemsCount.toString()
+                }
+            }
         }
     }
 
@@ -56,23 +56,14 @@ class CatalogFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         cartIcon.setOnClickListener {
-            rootRouter.openShoppingCart()
+            presenter.onCartClick()
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect(::render)
-            }
-        }
+        presenter.attach(mvpView)
     }
 
-    private fun render(state: CatalogUiState) {
-        adapter.setCatalogItems(state.categories)
-        if (state.cartItemsCount == 0) {
-            cartItemsAmount.visibility = View.GONE
-        } else {
-            cartItemsAmount.visibility = View.VISIBLE
-            cartItemsAmount.text = state.cartItemsCount.toString()
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.detach()
     }
 
     override fun layoutId(): Int {
@@ -92,4 +83,9 @@ class CatalogFragment : BaseFragment() {
             return CatalogFragment()
         }
     }
+}
+
+interface CatalogMvpView: MvpView {
+    fun updateList(models: ArrayList<CategoryViewModel>)
+    fun updateItemsCount(itemsCount: Int)
 }

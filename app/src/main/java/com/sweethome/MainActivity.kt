@@ -2,20 +2,23 @@ package com.sweethome
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.sweethome.data.AssetsCatalogRepository
+import com.sweethome.data.InMemoryCartRepository
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var rootRouter: RootRouterImpl
-        private set
+    private lateinit var rootRouter: RootRouterImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        rootRouter = RootRouterImpl(supportFragmentManager)
-        if (savedInstanceState == null) {
-            rootRouter.showCatalog()
-        }
+        rootRouter = RootRouterImpl(
+            supportFragmentManager,
+            InMemoryCartRepository(),
+            AssetsCatalogRepository(assets)
+        )
+        rootRouter.showCatalog()
     }
 
     override fun onBackPressed() {

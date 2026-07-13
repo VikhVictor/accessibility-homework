@@ -7,18 +7,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.CallSuper
 import androidx.fragment.app.Fragment
-import com.sweethome.MainActivity
 import com.sweethome.R
-import com.sweethome.RootRouter
-import com.sweethome.SweetHomeApplication
 
-abstract class BaseFragment : Fragment() {
+abstract class BaseFragment<T: MockPresenter<V>, V: MvpView> : Fragment(), MvpView {
 
-    protected val application: SweetHomeApplication
-        get() = requireActivity().application as SweetHomeApplication
-
-    protected val rootRouter: RootRouter
-        get() = (requireActivity() as MainActivity).rootRouter
+    protected lateinit var presenter: T
+    protected lateinit var mvpView: V
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +36,20 @@ abstract class BaseFragment : Fragment() {
         if (showCart()) {
             shoppingCart.visibility = View.VISIBLE
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        presenter.attach(mvpView)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        presenter.detach()
+    }
+
+    fun setMvpPresenter(presenter: T) {
+        this.presenter = presenter
     }
 
     abstract fun layoutId(): Int

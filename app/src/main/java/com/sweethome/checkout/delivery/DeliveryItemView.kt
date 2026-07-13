@@ -7,7 +7,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.sweethome.R
-import com.sweethome.presentation.checkout.DeliveryUiModel
 
 class DeliveryItemView(context: Context, attributeSet: AttributeSet?) :
     FrameLayout(context, attributeSet) {
@@ -31,7 +30,7 @@ class DeliveryItemView(context: Context, attributeSet: AttributeSet?) :
         toggle = findViewById(R.id.toggle)
     }
 
-    fun update(item: DeliveryUiModel) {
+    fun update(item: DeliveryViewModel) {
         company.text = item.name
         if (item.timeFrom == item.timeTo) {
             time.text = resources.getString(R.string.delivery_time)
