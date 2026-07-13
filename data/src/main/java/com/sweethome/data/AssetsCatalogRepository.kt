@@ -3,32 +3,51 @@ package com.sweethome.data
 import android.content.res.AssetManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.sweethome.item.FullItemViewModel
-import com.sweethome.shop.catalog.CategoryItem
+import com.sweethome.domain.model.Category
+import com.sweethome.domain.model.Product
+import com.sweethome.domain.repository.CatalogRepository
 import java.io.InputStreamReader
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AssetsCatalogRepository(
-    private val assetManager: AssetManager
+    private val assetManager: AssetManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : CatalogRepository {
 
     private val gson = Gson()
+    private val products: List<Product> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        readProducts()
+    }
+    private val categories: List<Category> by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+        readCategories()
+    }
 
-    override fun loadCatalog(): ArrayList<FullItemViewModel> =
+    override suspend fun loadCatalog(): List<Product> = withContext(ioDispatcher) {
+        products
+    }
+
+    override suspend fun loadCategories(): List<Category> = withContext(ioDispatcher) {
+        categories
+    }
+
+    private fun readProducts(): List<Product> =
         assetManager.open(PRODUCTS_FILE).use { inputStream ->
             InputStreamReader(inputStream).use { reader ->
                 gson.fromJson(
                     reader,
-                    object : TypeToken<ArrayList<FullItemViewModel>>() {}.type
+                    object : TypeToken<List<Product>>() {}.type
                 )
             }
         }
 
-    override fun loadCategories(): List<CategoryItem> =
+    private fun readCategories(): List<Category> =
         assetManager.open(CATEGORIES_FILE).use { inputStream ->
             InputStreamReader(inputStream).use { reader ->
                 gson.fromJson(
                     reader,
-                    object : TypeToken<List<CategoryItem>>() {}.type
+                    object : TypeToken<List<Category>>() {}.type
                 )
             }
         }

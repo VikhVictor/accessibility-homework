@@ -1,9 +1,9 @@
 package com.sweethome
 
-import com.sweethome.item.FullItemViewModel
+import com.sweethome.domain.model.Product
 
 interface RootRouter {
-    fun openDetails(model: FullItemViewModel)
+    fun openDetails(model: Product)
     fun openShoppingCart()
     fun openCheckout(fullPrice: String)
     fun showCatalog()

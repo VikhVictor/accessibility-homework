@@ -6,15 +6,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sweethome.R
+import com.sweethome.presentation.catalog.CategoryUiModel
 import com.sweethome.shop.category.CategoryRecyclerView
 import com.sweethome.shop.category.OnItemClickListener
 
 class CatalogAdapter : RecyclerView.Adapter<CategoryViewHolder>() {
 
-    private val catalogItems: ArrayList<CategoryViewModel> = arrayListOf()
+    private val catalogItems: ArrayList<CategoryUiModel> = arrayListOf()
     private lateinit var itemClickListener: OnItemClickListener
 
-    fun setCatalogItems(items: ArrayList<CategoryViewModel>) {
+    fun setCatalogItems(items: List<CategoryUiModel>) {
         catalogItems.clear()
         catalogItems.addAll(items)
         notifyDataSetChanged()
@@ -46,7 +47,7 @@ class CategoryViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val category: CategoryRecyclerView = itemView.findViewById(R.id.category)
     private val title: TextView = itemView.findViewById(R.id.title)
 
-    fun bind(categoryViewModel: CategoryViewModel, itemClickListener: OnItemClickListener) {
+    fun bind(categoryViewModel: CategoryUiModel, itemClickListener: OnItemClickListener) {
         category.update(categoryViewModel, itemClickListener)
         title.text = categoryViewModel.title
     }

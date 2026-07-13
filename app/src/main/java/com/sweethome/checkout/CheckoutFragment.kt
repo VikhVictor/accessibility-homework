@@ -6,19 +6,26 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.sweethome.R
 import com.sweethome.base.BaseFragment
-import com.sweethome.base.MvpView
 import com.sweethome.base.selector.CheckedChangeListener
 import com.sweethome.base.selector.HorizontalSelector
 import com.sweethome.base.selector.SelectorItemModel
+import com.sweethome.base.viewModelFactory
 import com.sweethome.checkout.delivery.DeliveryItemView
-import com.sweethome.checkout.delivery.DeliveryType
-import com.sweethome.checkout.delivery.DeliveryViewModel
 import com.sweethome.checkout.delivery.OnChosenListener
-import kotlin.collections.ArrayList
+import com.sweethome.presentation.checkout.CheckoutIcon
+import com.sweethome.presentation.checkout.CheckoutSelectorItem
+import com.sweethome.presentation.checkout.CheckoutUiState
+import com.sweethome.presentation.checkout.CheckoutViewModel
+import com.sweethome.presentation.checkout.DeliveryUiModel
+import kotlinx.coroutines.launch
 
-class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
+class CheckoutFragment : BaseFragment() {
 
     private lateinit var fullPrice: String
     lateinit var shipmentAddressesSelector: HorizontalSelector
@@ -28,43 +35,25 @@ class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
     lateinit var shipmentPrice: TextView
     lateinit var deliveryTypesContainer: LinearLayout
     lateinit var totalPrice: TextView
-
-    init {
-        mvpView = object : CheckoutMvpView {
-            override fun updateShipmentAddresses(shipmentAddresses: ArrayList<SelectorItemModel>) {
-                shipmentAddressesSelector.updateValues(shipmentAddresses)
+    private val viewModel: CheckoutViewModel by lazy {
+        ViewModelProvider(
+            this,
+            viewModelFactory(CheckoutViewModel::class.java) {
+                CheckoutViewModel(fullPrice)
             }
-
-            override fun updatePaymentTypes(shipmentAddresses: ArrayList<SelectorItemModel>) {
-                paymentTypesSelector.updateValues(shipmentAddresses)
-            }
-
-            override fun updateFooter(
-                subtotalPriceText: String,
-                shipmentPriceText: String,
-                totalPriceText: String
-            ) {
-                itemsPrice.text = getString(R.string.subtotal_price, subtotalPriceText)
-                shipmentPrice.text = getString(R.string.shipment_price,  shipmentPriceText)
-                totalPrice.text = totalPriceText
-            }
-
-            override fun updateDeliveryTypes(deliveryTypes: ArrayList<DeliveryViewModel>) {
-                updateDeliveryView(deliveryTypes)
-            }
-        }
+        )[CheckoutViewModel::class.java]
     }
 
     private val addressChangeListener = object : CheckedChangeListener {
 
         override fun onCheckedChange(item: SelectorItemModel, checked: Boolean) {
-            presenter.onAddressChanged(item, checked)
+            viewModel.selectAddress(item.id)
         }
     }
 
     private val paymentChangeListener = object : CheckedChangeListener {
         override fun onCheckedChange(item: SelectorItemModel, checked: Boolean) {
-            presenter.onPaymentChanged(item, checked)
+            viewModel.selectPayment(item.id)
         }
     }
 
@@ -86,15 +75,41 @@ class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        presenter.init(fullPrice)
         super.onViewCreated(view, savedInstanceState)
         shipmentAddressesSelector.setCheckedChangeListener(addressChangeListener)
         paymentTypesSelector.setCheckedChangeListener(paymentChangeListener)
         confirmButton.setOnClickListener {
-            presenter.onConfirm()
+            viewModel.confirm()
         }
-
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect(::render)
+            }
+        }
     }
+
+    private fun render(state: CheckoutUiState) {
+        shipmentAddressesSelector.updateValues(state.shipmentAddresses.toSelectorItems())
+        paymentTypesSelector.updateValues(state.paymentTypes.toSelectorItems())
+        itemsPrice.text = getString(R.string.subtotal_price, state.subtotalPrice)
+        shipmentPrice.text = getString(R.string.shipment_price, state.shipmentPrice)
+        totalPrice.text = state.totalPrice
+        updateDeliveryView(state.deliveryTypes)
+    }
+
+    private fun List<CheckoutSelectorItem>.toSelectorItems(): ArrayList<SelectorItemModel> =
+        mapTo(arrayListOf()) { item ->
+            SelectorItemModel(
+                id = item.id,
+                imageId = when (item.icon) {
+                    CheckoutIcon.ADDRESS -> R.drawable.address_icon
+                    CheckoutIcon.VISA -> R.drawable.visa
+                },
+                title = item.title,
+                subtitle = item.subtitle,
+                checked = item.checked
+            )
+        }
 
     override fun layoutId(): Int {
         return R.layout.checkout_layout
@@ -104,7 +119,7 @@ class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
         return getString(R.string.checkout_title)
     }
 
-    private fun updateDeliveryView(deliveryTypes: ArrayList<DeliveryViewModel>) {
+    private fun updateDeliveryView(deliveryTypes: List<DeliveryUiModel>) {
         if (deliveryTypesContainer.childCount != deliveryTypes.size) {
             deliveryTypesContainer.removeAllViews()
             fillDeliveryViews(deliveryTypes)
@@ -115,13 +130,13 @@ class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
         }
     }
 
-    private fun fillDeliveryViews(deliveryTypes: ArrayList<DeliveryViewModel>) {
+    private fun fillDeliveryViews(deliveryTypes: List<DeliveryUiModel>) {
         for (item in deliveryTypes) {
             val itemView = context?.let { DeliveryItemView(it) }
             itemView?.update(item)
             itemView?.onChosenListener = object : OnChosenListener {
                 override fun onItemChosen(id: String) {
-                    presenter.onDeliveryTypeSelected(id)
+                    viewModel.selectDelivery(id)
                 }
             }
             deliveryTypesContainer.addView(itemView)
@@ -139,15 +154,4 @@ class CheckoutFragment : BaseFragment<CheckoutPresenter, CheckoutMvpView>() {
             return fragment
         }
     }
-}
-
-interface CheckoutMvpView: MvpView {
-    fun updateShipmentAddresses(shipmentAddresses: ArrayList<SelectorItemModel>)
-    fun updatePaymentTypes(shipmentAddresses: ArrayList<SelectorItemModel>)
-    fun updateFooter(
-        subtotalPriceText: String,
-        shipmentPriceText: String,
-        totalPriceText: String
-    )
-    fun updateDeliveryTypes(deliveryTypes: ArrayList<DeliveryViewModel>)
 }

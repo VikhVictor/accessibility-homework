@@ -8,14 +8,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.sweethome.R
-import com.sweethome.item.FullItemViewModel
+import com.sweethome.domain.model.Product
 
 class CategoryAdapter : RecyclerView.Adapter<ItemViewHolder>() {
 
     private lateinit var itemClickListener: OnItemClickListener
-    private val items: ArrayList<FullItemViewModel> = arrayListOf()
+    private val items: ArrayList<Product> = arrayListOf()
 
-    fun setItems(items: ArrayList<FullItemViewModel>) {
+    fun setItems(items: List<Product>) {
         this.items.clear()
         this.items.addAll(items)
         notifyDataSetChanged()
@@ -49,7 +49,7 @@ class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     private val image: ImageView = itemView.findViewById(R.id.image)
 
     fun bind(
-        viewModel: FullItemViewModel,
+        viewModel: Product,
         itemClickListener: OnItemClickListener
     ) {
         name.text = viewModel.collection
@@ -72,5 +72,5 @@ class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
 }
 
 interface OnItemClickListener {
-    fun onItemClick(model: FullItemViewModel)
+    fun onItemClick(model: Product)
 }

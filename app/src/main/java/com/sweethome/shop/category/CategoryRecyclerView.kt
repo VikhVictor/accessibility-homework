@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.sweethome.R
-import com.sweethome.shop.catalog.CategoryViewModel
+import com.sweethome.presentation.catalog.CategoryUiModel
 import com.sweethome.utils.StartEndOffsetItemDecoration
 
 class CategoryRecyclerView(context: Context, attributeSet: AttributeSet): RecyclerView(context, attributeSet) {
@@ -19,7 +19,7 @@ class CategoryRecyclerView(context: Context, attributeSet: AttributeSet): Recycl
     }
 
     fun update(
-        categoryViewModel: CategoryViewModel,
+        categoryViewModel: CategoryUiModel,
         itemClickListener: OnItemClickListener
     ) {
         categoryAdapter.setItemClickListener(itemClickListener)

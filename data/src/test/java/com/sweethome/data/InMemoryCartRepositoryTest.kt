@@ -14,7 +14,7 @@ class InMemoryCartRepositoryTest {
         repository.addItem("lamp")
 
         assertEquals(3, repository.itemsCount())
-        assertEquals(2, repository.cartItems["chair"])
+        assertEquals(2, repository.cartItems.value["chair"])
 
         repository.removeItem("chair")
 

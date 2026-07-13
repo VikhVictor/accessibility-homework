@@ -4,11 +4,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.sweethome.R
 import com.sweethome.base.BaseFragment
-import com.sweethome.base.MvpView
+import com.sweethome.base.viewModelFactory
+import com.sweethome.domain.model.Product
+import com.sweethome.presentation.item.ItemDetailsUiState
+import com.sweethome.presentation.item.ItemDetailsViewModel
+import kotlinx.coroutines.launch
 
-class ItemInfoFragment : BaseFragment<ItemInfoPresenter, ItemInfoMvpView>() {
+class ItemInfoFragment : BaseFragment() {
 
     private lateinit var cartItemsAmount: TextView
     private lateinit var aboutText: TextView
@@ -20,30 +28,17 @@ class ItemInfoFragment : BaseFragment<ItemInfoPresenter, ItemInfoMvpView>() {
     private lateinit var cartBtn: View
     private lateinit var itemId: String
     private lateinit var collection: String
-
-    init {
-        mvpView = object : ItemInfoMvpView {
-            override fun updateItemsCount(itemsCount: Int) {
-                if (itemsCount == 0) {
-                    cartItemsAmount.visibility = View.GONE
-                } else {
-                    cartItemsAmount.visibility = View.VISIBLE
-                    cartItemsAmount.text = itemsCount.toString()
-                }
-            }
-
-            override fun updateInfo(viewModel: FullItemViewModel) {
-                val imageId = resources.getIdentifier(
-                    viewModel.image,
-                    "drawable", context?.packageName
+    private val viewModel: ItemDetailsViewModel by lazy {
+        ViewModelProvider(
+            this,
+            viewModelFactory(ItemDetailsViewModel::class.java) {
+                ItemDetailsViewModel(
+                    itemId,
+                    application.catalogRepository,
+                    application.cartRepository
                 )
-                image.setImageResource(imageId)
-                designer.setText(viewModel.designer)
-                price.text = "${viewModel.currency} ${viewModel.price}"
-                modelName.text = viewModel.model
-                aboutText.text = viewModel.about
             }
-        }
+        )[ItemDetailsViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,19 +62,39 @@ class ItemInfoFragment : BaseFragment<ItemInfoPresenter, ItemInfoMvpView>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        presenter.init(itemId)
-        presenter.attach(mvpView)
         addToCartButton.setOnClickListener {
-            presenter.onAddToCartClicked()
+            viewModel.addToCart()
         }
         cartBtn.setOnClickListener {
-            presenter.onCartClicked()
+            rootRouter.openShoppingCart()
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect(::render)
+            }
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        presenter.detach()
+    private fun render(state: ItemDetailsUiState) {
+        if (state.cartItemsCount == 0) {
+            cartItemsAmount.visibility = View.GONE
+        } else {
+            cartItemsAmount.visibility = View.VISIBLE
+            cartItemsAmount.text = state.cartItemsCount.toString()
+        }
+
+        state.product?.let { product ->
+            val imageId = resources.getIdentifier(
+                product.image,
+                "drawable",
+                context?.packageName
+            )
+            image.setImageResource(imageId)
+            designer.text = product.designer
+            price.text = "${product.currency} ${product.price}"
+            modelName.text = product.model
+            aboutText.text = product.about
+        }
     }
 
     override fun layoutId(): Int {
@@ -95,7 +110,7 @@ class ItemInfoFragment : BaseFragment<ItemInfoPresenter, ItemInfoMvpView>() {
     }
 
     companion object {
-        fun newInstance(model: FullItemViewModel): ItemInfoFragment {
+        fun newInstance(model: Product): ItemInfoFragment {
             val fragment = ItemInfoFragment()
             val bundle = Bundle()
             bundle.putString("item_id", model.id)
@@ -104,9 +119,4 @@ class ItemInfoFragment : BaseFragment<ItemInfoPresenter, ItemInfoMvpView>() {
             return fragment
         }
     }
-}
-
-interface ItemInfoMvpView : MvpView {
-    fun updateItemsCount(count: Int)
-    fun updateInfo(viewModel: FullItemViewModel)
 }
